@@ -1283,7 +1283,6 @@ func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string,
 }
 
 //secrets config
-
 func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	var sec Secret
 	secret, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/egov-demo-secrets.yaml")
@@ -1300,7 +1299,6 @@ func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	var Db_Password string
 	var Db_FlywayUsername string
 	var Db_FlywayPassword string
-	var EgovNotificationSms_Username string
 	var EgovNotificationSms_Password string
 	var EgovFilestore_AwsKey string
 	var EgovFilestore_AwsSecretKey string
@@ -1408,7 +1406,7 @@ func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 		sec.ClusterConfigs.Secrets.Db.FlywayPassword = FlywayPassword
 	}
 	if SecretConfig["EgovNotificationSms_Username"] != "" {
-		sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = SecretConfig[EgovNotificationSms_Username]
+		sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = SecretConfig["EgovNotificationSms_Username"]
 	} else {
 		sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = NotUsername
 	}
