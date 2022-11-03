@@ -165,6 +165,8 @@ type Output struct {
 		} `json:"zookeeper_volume_ids"`
 	} `json:"outputs"`
 }
+
+//quickstart tfstate struct
 type Quickstart struct {
 	Outputs struct {
 		PublicIP struct {
@@ -336,10 +338,10 @@ func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string,
 									GitSync[l] = Config["BranchName"]
 								}
 								if l == "repo" {
-									if data[i]=="egov-mdms-service"{
-										GitSync[l]=Config["mdms-branch"]
-									}else{
-										GitSync[l]=Config["configs-branch"]
+									if data[i] == "egov-mdms-service" {
+										GitSync[l] = Config["mdms-branch"]
+									} else {
+										GitSync[l] = Config["configs-branch"]
 									}
 								}
 							}
@@ -1283,7 +1285,7 @@ func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string,
 }
 
 //secrets config
-func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
+func SecretFile(cluster_name string, Ssh string, modules []string, St map[string]interface{}) {
 	var sec Secret
 	secret, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/egov-demo-secrets.yaml")
 	if err != nil {
@@ -1293,8 +1295,10 @@ func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	if err != nil {
 		log.Printf("%v", err)
 	}
-	eUsername := sec.ClusterConfigs.Secrets.Db.Username
-	fmt.Println(eUsername)
+	// fmt.Println("The secret list")
+	// fmt.Println(St)
+	// eUsername := sec.ClusterConfigs.Secrets.Db.Username
+	// fmt.Println(eUsername)
 	var Db_Username string
 	var Db_Password string
 	var Db_FlywayUsername string
@@ -1334,6 +1338,7 @@ func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	var Oauth2Proxy_ClientID string
 	var Oauth2Proxy_ClientSecret string
 	var Oauth2Proxy_CookieSecret string
+	var EgovNotificationSms_Username string
 
 	Username := sec.ClusterConfigs.Secrets.Db.Username
 	Password := sec.ClusterConfigs.Secrets.Db.Password
@@ -1405,115 +1410,121 @@ func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	} else {
 		sec.ClusterConfigs.Secrets.Db.FlywayPassword = FlywayPassword
 	}
-	if SecretConfig["EgovNotificationSms_Username"] != "" {
-		sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = SecretConfig["EgovNotificationSms_Username"]
-	} else {
-		sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = NotUsername
-	}
-	fmt.Println("Enter EgovNotificationSms_Password:")
-	fmt.Scanln(&EgovNotificationSms_Password)
-	if EgovNotificationSms_Password != "" {
-		sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = EgovNotificationSms_Password
-	} else {
-		sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = NotPassword
-	}
-	fmt.Println("Enter EgovFilestore_AwsKey:")
-	fmt.Scanln(&EgovFilestore_AwsKey)
-	if EgovFilestore_AwsKey != "" {
-		sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = EgovFilestore_AwsKey
-	} else {
-		sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = AwsKey
-	}
-	fmt.Println("Enter EgovFilestore_AwsSecretKey:")
-	fmt.Scanln(&EgovFilestore_AwsSecretKey)
-	if EgovFilestore_AwsSecretKey != "" {
-		sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = EgovFilestore_AwsSecretKey
-	} else {
-		sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = AwsSecretKey
-	}
-	fmt.Println("Enter EgovLocation_Gmapskey:")
-	fmt.Scanln(&EgovLocation_Gmapskey)
-	if EgovLocation_Gmapskey != "" {
-		sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = EgovLocation_Gmapskey
-	} else {
-		sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = Gmapskey
-	}
-	fmt.Println("Enter EgovPgService_AxisMerchantID:")
-	fmt.Scanln(&EgovPgService_AxisMerchantID)
-	if EgovPgService_AxisMerchantID != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = EgovPgService_AxisMerchantID
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = AxisMerchantID
-	}
-	fmt.Println("Enter EgovPgService_AxisMerchantSecretKey:")
-	fmt.Scanln(&EgovPgService_AxisMerchantSecretKey)
-	if EgovPgService_AxisMerchantSecretKey != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = EgovPgService_AxisMerchantSecretKey
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = AxisMerchantSecretKey
-	}
-	fmt.Println("Enter EgovPgService_AxisMerchantUser:")
-	fmt.Scanln(&EgovPgService_AxisMerchantUser)
-	if EgovPgService_AxisMerchantUser != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = EgovPgService_AxisMerchantUser
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = AxisMerchantUser
-	}
-	fmt.Println("Enter EgovPgService_AxisMerchantPwd:")
-	fmt.Scanln(&EgovPgService_AxisMerchantPwd)
-	if EgovPgService_AxisMerchantPwd != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = EgovPgService_AxisMerchantPwd
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = AxisMerchantPwd
-	}
-	fmt.Println("Enter EgovPgService_AxisMerchantAccessCode:")
-	fmt.Scanln(&EgovPgService_AxisMerchantAccessCode)
-	if EgovPgService_AxisMerchantAccessCode != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = EgovPgService_AxisMerchantAccessCode
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = AxisMerchantAccessCode
-	}
-	fmt.Println("Enter EgovPgService_PayuMerchantKey:")
-	fmt.Scanln(&EgovPgService_PayuMerchantKey)
-	if EgovPgService_PayuMerchantKey != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = EgovPgService_PayuMerchantKey
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = PayuMerchantKey
-	}
-	fmt.Println("Enter EgovPgService_PayuMerchantSalt:")
-	fmt.Scanln(&EgovPgService_PayuMerchantSalt)
-	if EgovPgService_PayuMerchantSalt != "" {
-		sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = EgovPgService_PayuMerchantSalt
-	} else {
-		sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = PayuMerchantSalt
-	}
-	fmt.Println("Enter Pgadmin_AdminEmail:")
-	fmt.Scanln(&Pgadmin_AdminEmail)
-	if Pgadmin_AdminEmail != "" {
-		sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = Pgadmin_AdminEmail
-	} else {
-		sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = AdminEmail
-	}
-	fmt.Println("Enter Pgadmin_AdminPassword:")
-	fmt.Scanln(&Pgadmin_AdminPassword)
-	if Pgadmin_AdminPassword != "" {
-		sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = Pgadmin_AdminPassword
-	} else {
-		sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = AdminPassword
-	}
-	fmt.Println("Enter Pgadmin_ReadEmail:")
-	fmt.Scanln(&Pgadmin_ReadEmail)
-	if Pgadmin_ReadEmail != "" {
-		sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = Pgadmin_ReadEmail
-	} else {
-		sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = ReadEmail
-	}
-	fmt.Println("Enter Pgadmin_ReadPassword:")
-	fmt.Scanln(&Pgadmin_ReadPassword)
-	if Pgadmin_ReadPassword != "" {
-		sec.ClusterConfigs.Secrets.Pgadmin.ReadPassword = Pgadmin_ReadPassword
-	} else {
-		sec.ClusterConfigs.Secrets.Pgadmin.ReadPassword = ReadPassword
+	for i := range modules {
+		if modules[i] == "m_property-tax" {
+			fmt.Println("Enter EgovNotificationSms_Username:")
+			fmt.Scanln(&EgovNotificationSms_Username)
+			if EgovNotificationSms_Username != "" {
+				sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = EgovNotificationSms_Username
+			} else {
+				sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = NotUsername
+			}
+			fmt.Println("Enter EgovNotificationSms_Password:")
+			fmt.Scanln(&EgovNotificationSms_Password)
+			if EgovNotificationSms_Password != "" {
+				sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = EgovNotificationSms_Password
+			} else {
+				sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = NotPassword
+			}
+			fmt.Println("Enter EgovFilestore_AwsKey:")
+			fmt.Scanln(&EgovFilestore_AwsKey)
+			if EgovFilestore_AwsKey != "" {
+				sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = EgovFilestore_AwsKey
+			} else {
+				sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = AwsKey
+			}
+			fmt.Println("Enter EgovFilestore_AwsSecretKey:")
+			fmt.Scanln(&EgovFilestore_AwsSecretKey)
+			if EgovFilestore_AwsSecretKey != "" {
+				sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = EgovFilestore_AwsSecretKey
+			} else {
+				sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = AwsSecretKey
+			}
+			fmt.Println("Enter EgovLocation_Gmapskey:")
+			fmt.Scanln(&EgovLocation_Gmapskey)
+			if EgovLocation_Gmapskey != "" {
+				sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = EgovLocation_Gmapskey
+			} else {
+				sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = Gmapskey
+			}
+			fmt.Println("Enter EgovPgService_AxisMerchantID:")
+			fmt.Scanln(&EgovPgService_AxisMerchantID)
+			if EgovPgService_AxisMerchantID != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = EgovPgService_AxisMerchantID
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = AxisMerchantID
+			}
+			fmt.Println("Enter EgovPgService_AxisMerchantSecretKey:")
+			fmt.Scanln(&EgovPgService_AxisMerchantSecretKey)
+			if EgovPgService_AxisMerchantSecretKey != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = EgovPgService_AxisMerchantSecretKey
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = AxisMerchantSecretKey
+			}
+			fmt.Println("Enter EgovPgService_AxisMerchantUser:")
+			fmt.Scanln(&EgovPgService_AxisMerchantUser)
+			if EgovPgService_AxisMerchantUser != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = EgovPgService_AxisMerchantUser
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = AxisMerchantUser
+			}
+			fmt.Println("Enter EgovPgService_AxisMerchantPwd:")
+			fmt.Scanln(&EgovPgService_AxisMerchantPwd)
+			if EgovPgService_AxisMerchantPwd != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = EgovPgService_AxisMerchantPwd
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = AxisMerchantPwd
+			}
+			fmt.Println("Enter EgovPgService_AxisMerchantAccessCode:")
+			fmt.Scanln(&EgovPgService_AxisMerchantAccessCode)
+			if EgovPgService_AxisMerchantAccessCode != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = EgovPgService_AxisMerchantAccessCode
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = AxisMerchantAccessCode
+			}
+			fmt.Println("Enter EgovPgService_PayuMerchantKey:")
+			fmt.Scanln(&EgovPgService_PayuMerchantKey)
+			if EgovPgService_PayuMerchantKey != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = EgovPgService_PayuMerchantKey
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = PayuMerchantKey
+			}
+			fmt.Println("Enter EgovPgService_PayuMerchantSalt:")
+			fmt.Scanln(&EgovPgService_PayuMerchantSalt)
+			if EgovPgService_PayuMerchantSalt != "" {
+				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = EgovPgService_PayuMerchantSalt
+			} else {
+				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = PayuMerchantSalt
+			}
+			fmt.Println("Enter Pgadmin_AdminEmail:")
+			fmt.Scanln(&Pgadmin_AdminEmail)
+			if Pgadmin_AdminEmail != "" {
+				sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = Pgadmin_AdminEmail
+			} else {
+				sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = AdminEmail
+			}
+			fmt.Println("Enter Pgadmin_AdminPassword:")
+			fmt.Scanln(&Pgadmin_AdminPassword)
+			if Pgadmin_AdminPassword != "" {
+				sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = Pgadmin_AdminPassword
+			} else {
+				sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = AdminPassword
+			}
+			fmt.Println("Enter Pgadmin_ReadEmail:")
+			fmt.Scanln(&Pgadmin_ReadEmail)
+			if Pgadmin_ReadEmail != "" {
+				sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = Pgadmin_ReadEmail
+			} else {
+				sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = ReadEmail
+			}
+			fmt.Println("Enter Pgadmin_ReadPassword:")
+			fmt.Scanln(&Pgadmin_ReadPassword)
+			if Pgadmin_ReadPassword != "" {
+				sec.ClusterConfigs.Secrets.Pgadmin.ReadPassword = Pgadmin_ReadPassword
+			} else {
+				sec.ClusterConfigs.Secrets.Pgadmin.ReadPassword = ReadPassword
+			}
+		}
 	}
 	fmt.Println("Enter EgovEncService_MasterPassword:")
 	fmt.Scanln(&EgovEncService_MasterPassword)

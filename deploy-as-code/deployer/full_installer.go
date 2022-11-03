@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fatih/structs"
 	"github.com/jcelliott/lumber"
 	"github.com/manifoldco/promptui"
 	"golang.org/x/crypto/ssh"
@@ -34,8 +35,6 @@ var Flag string
 var db_pswd string
 var sshFile string
 var cluster_name string
-var SecretConfig map[string]string
-
 var Reset = "\033[0m"
 var Red = "\033[31m"
 var Green = "\033[32m"
@@ -57,26 +56,83 @@ type Digit struct {
 }
 
 type State struct {
-	Proceed string `yaml:"Proceed"`
-	Infra string `yaml:"Infra"`
-	Product string `yaml:"Product"`
-	Productversion string `yaml:"Productversion"`
-	Modules []string `yaml:"Modules"`
-	CloudType string `yaml:"CloudType"`
-	Awsacess string `yaml:"Awsacess"`
-	Aws_access_key string `yaml:"Aws_access_key"`
-	Aws_secret_key string `yaml:"Aws_secret_key"`
-	Aws_session_key string `yaml:"Aws_session_key"`
-	Aws_profile string `yaml:"Aws Profile"`
-	Aws_command string `yaml:"Aws_command"`
-	Clustername string `yaml:"Clustername"`
-	Db_pass string `yaml:"Database password"`
-	Git_command string `yaml:"Git command"`
-	T_init string `yaml:"Terraform init"`
-	T_plan string `yaml:"Terraform plan"`
-	T_apply string `yaml:"Terraform apply"`
+	Proceed                                           string   `yaml:"Proceed"`
+	Infra                                             string   `yaml:"Infra"`
+	Product                                           string   `yaml:"Product"`
+	Productversion                                    string   `yaml:"Productversion"`
+	Modules                                           []string `yaml:"Modules"`
+	CloudType                                         string   `yaml:"CloudType"`
+	Awsacess                                          string   `yaml:"Awsacess"`
+	Aws_access_key                                    string   `yaml:"Aws_access_key"`
+	Aws_secret_key                                    string   `yaml:"Aws_secret_key"`
+	Aws_session_key                                   string   `yaml:"Aws_session_key"`
+	Aws_profile                                       string   `yaml:"Aws Profile"`
+	Aws_command                                       string   `yaml:"Aws_command"`
+	Clustername                                       string   `yaml:"Clustername"`
+	Db_pass                                           string   `yaml:"Database password"`
+	Git_command                                       string   `yaml:"Git command"`
+	T_init                                            string   `yaml:"Terraform init"`
+	T_plan                                            string   `yaml:"Terraform plan"`
+	T_apply                                           string   `yaml:"Terraform apply"`
+	Domain                                            string   `yaml:"Domain"`
+	Branch                                            string   `yaml:"Config & mdms branch"`
+	Config_git_url                                    string   `yaml:"Configs Git URL"`
+	Mdms_git_url                                      string   `yaml:"MDMS Git URL"`
+	SmsUrl                                            string   `yaml:"SMS URL"`
+	SmsGateway                                        string   `yaml:"SMS Gateway"`
+	SmsSender                                         string   `yaml:"SMS Sender"`
+	SmsUsername                                       string   `yaml:"SMS Username"`
+	Bucket                                            string   `yaml:"Bucket name"`
+	Db_Username                                       string   `yaml:"Db_Username"`
+	Db_Password                                       string   `yaml:"Db_Password"`
+	Db_FlywayUsername                                 string   `yaml:"Db_FlywayUsername"`
+	Db_FlywayPassword                                 string   `yaml:"Db_FlywayPassword"`
+	EgovNotificationSms_Username                      string   `yaml:"EgovNotificationSms_Username"`
+	EgovNotificationSms_Password                      string   `yaml:"EgovNotificationSms_Password"`
+	EgovFilestore_AwsKey                              string   `yaml:"EgovFilestore_AwsKey"`
+	EgovFilestore_AwsSecretKey                        string   `yaml:"EgovFilestore_AwsSecretKey"`
+	EgovLocation_Gmapskey                             string   `yaml:"EgovLocation_Gmapskey"`
+	EgovPgService_AxisMerchantID                      string   `yaml:"EgovPgService_AxisMerchantID"`
+	EgovPgService_AxisMerchantSecretKey               string   `yaml:"EgovPgService_AxisMerchantSecretKey"`
+	EgovPgService_AxisMerchantUser                    string   `yaml:"EgovPgService_AxisMerchantUser"`
+	EgovPgService_AxisMerchantPwd                     string   `yaml:"EgovPgService_AxisMerchantPwd"`
+	EgovPgService_AxisMerchantAccessCode              string   `yaml:"EgovPgService_AxisMerchantAccessCode"`
+	EgovPgService_PayuMerchantKey                     string   `yaml:"EgovPgService_PayuMerchantKey"`
+	EgovPgService_PayuMerchantSalt                    string   `yaml:"EgovPgService_PayuMerchantSalt"`
+	Pgadmin_AdminEmail                                string   `yaml:"Pgadmin_AdminEmail"`
+	Pgadmin_AdminPassword                             string   `yaml:"Pgadmin_AdminPassword"`
+	Pgadmin_ReadEmail                                 string   `yaml:"Pgadmin_ReadEmail"`
+	Pgadmin_ReadPassword                              string   `yaml:"Pgadmin_ReadPassword"`
+	EgovEncService_MasterPassword                     string   `yaml:"EgovEncService_MasterPassword"`
+	EgovEncService_MasterSalt                         string   `yaml:"EgovEncService_MasterSalt"`
+	EgovEncService_MasterInitialvector                string   `yaml:"EgovEncService_MasterInitialvector"`
+	EgovNotificationMail_Mailsenderusername           string   `yaml:"EgovNotificationMail_Mailsenderusername"`
+	EgovNotificationMail_Mailsenderpassword           string   `yaml:"EgovNotificationMail_Mailsenderpassword"`
+	Kibana_Namespace                                  string   `yaml:"Kibana_Namespace"`
+	Kibana_Credentials                                string   `yaml:"Kibana_Credentials"`
+	EgovSiMicroservice_SiMicroserviceUser             string   `yaml:"EgovSiMicroservice_SiMicroserviceUser"`
+	EgovSiMicroservice_SiMicroservicePassword         string   `yaml:"EgovSiMicroservice_SiMicroservicePassword"`
+	EgovSiMicroservice_MailSenderPassword             string   `yaml:"EgovSiMicroservice_MailSenderPassword"`
+	EgovEdcrNotification_EdcrMailUsername             string   `yaml:"EgovEdcrNotification_EdcrMailUsername"`
+	EgovEdcrNotification_EdcrMailPassword             string   `yaml:"EgovEdcrNotification_EdcrMailPassword"`
+	EgovEdcrNotification_EdcrSmsUsername              string   `yaml:"EgovEdcrNotification_EdcrSmsUsername"`
+	EgovEdcrNotification_EdcrSmsPassword              string   `yaml:"EgovEdcrNotification_EdcrSmsPassword"`
+	Chatbot_ValuefirstUsername                        string   `yaml:"Chatbot_ValuefirstUsername"`
+	Chatbot_ValuefirstPassword                        string   `yaml:"Chatbot_ValuefirstPassword"`
+	EgovUserChatbot_CitizenLoginPasswordOtpFixedValue string   `yaml:"EgovUserChatbot_CitizenLoginPasswordOtpFixedValue"`
+	Oauth2Proxy_ClientID                              string   `yaml:"Oauth2Proxy_ClientID"`
+	Oauth2Proxy_ClientSecret                          string   `yaml:"Oauth2Proxy_ClientSecret"`
+	Oauth2Proxy_CookieSecret                          string   `yaml:"Oauth2Proxy_CookieSecret"`
+	Ssh                                               string   `yaml:"SSH key"`
+	KnownHosts                                        string   `yaml:"Github knownhosts"`
+	Smsproceed                                        string   `yaml:"SMS"`
+	Fileproceed                                       string   `yaml:"Filestore"`
+	Botproceed                                        string   `yaml:"Botproceed"`
+	SshCreation                                       string   `yaml:"SSH KEY creation"`
 }
+
 var St State
+
 type Set struct {
 	set map[string]bool
 }
@@ -104,7 +160,7 @@ func main() {
 		if err != nil {
 			log.Printf("%v", err)
 		}
-	 }
+	}
 	var optedInfraType string          // Infra types supported to deploy DIGIT
 	var servicesToDeploy string        // Modules to be deployed
 	var number_of_worker_nodes int = 1 // No of VMs for the k8s worker nodes
@@ -136,18 +192,18 @@ func main() {
 
 	preReqConfirm := []string{"Yes", "No"}
 	var proceed string = ""
-	if St.Proceed==""{
-	proceed, _ = sel(preReqConfirm, "Are you good to proceed?")
-	St.Proceed=proceed
-	} else{
-		proceed=St.Proceed
+	if St.Proceed == "" {
+		proceed, _ = sel(preReqConfirm, "Are you good to proceed?")
+		St.Proceed = proceed
+	} else {
+		proceed = St.Proceed
 	}
 	if proceed == "Yes" {
-		if St.Infra==""{
+		if St.Infra == "" {
 			optedInfraType, _ = sel(infraType, "Select the below suitable infra option for your usecase")
-			St.Infra=optedInfraType
-		}else{
-			optedInfraType=St.Infra
+			St.Infra = optedInfraType
+		} else {
+			optedInfraType = St.Infra
 		}
 		switch optedInfraType {
 		case infraType[0]:
@@ -172,12 +228,12 @@ func main() {
 		}
 
 		servicesToDeploy = selectGovServicesToInstall()
-		if St.CloudType==""{
+		if St.CloudType == "" {
 			optedCloud, _ = sel(cloudPlatforms, "Choose the cloud type to provision the required servers for the selectdd gov stack services?")
-			St.CloudType=optedCloud
+			St.CloudType = optedCloud
 			fmt.Println(optedCloud)
-		}else{
-			optedCloud=St.CloudType
+		} else {
+			optedCloud = St.CloudType
 		}
 		switch optedCloud {
 		case cloudPlatforms[1]:
@@ -230,53 +286,55 @@ func main() {
 			cloudTemplate = "sample-aws"
 
 			accessTypes := []string{"Root Admin", "Temprory Admin", "Already configured"}
-			if St.Awsacess==""{
+			if St.Awsacess == "" {
 				optedAccessType, _ = sel(accessTypes, "Choose your AWS access type? eg: If your access is session based unlike root admin")
-				St.Awsacess=optedAccessType
-			}else{
-				optedAccessType=St.Awsacess
+				St.Awsacess = optedAccessType
+			} else {
+				optedAccessType = St.Awsacess
 			}
 			fmt.Println("\n Great, you need to input your " + optedCloud + "credentials to provision the cloud resources ..\n")
 
 			if optedAccessType == "Temprory Admin" {
-				if St.Aws_access_key==""{
+				if St.Aws_access_key == "" {
 					fmt.Println("Input the AWS access key id")
 					fmt.Scanln(&aws_access_key)
-					St.Aws_access_key=aws_access_key
-				}else{
-					aws_access_key =St.Aws_access_key
+					St.Aws_access_key = aws_access_key
+				} else {
+					aws_access_key = St.Aws_access_key
 				}
-				if St.Aws_secret_key==""{
+				if St.Aws_secret_key == "" {
 					fmt.Println("\nInput the AWS secret key")
 					fmt.Scanln(&aws_secret_key)
-					St.Aws_secret_key =aws_secret_key
-				}else{
-					aws_secret_key=St.Aws_secret_key 
+					St.Aws_secret_key = aws_secret_key
+				} else {
+					aws_secret_key = St.Aws_secret_key
 				}
-				if St.Aws_session_key==""{
+				if St.Aws_session_key == "" {
 					fmt.Println("\nInput the AWS Session Token")
 					fmt.Scanln(&aws_session_key)
-				} else{
-					aws_session_key=St.Aws_session_key
+					St.Aws_session_key = aws_session_key
+					writeState()
+				} else {
+					aws_session_key = St.Aws_session_key
 				}
 
 				cloudLoginCredentials = awslogin(aws_access_key, aws_secret_key, aws_session_key, "")
 			} else if optedAccessType == "Root Admin" {
 
-				if St.Aws_access_key==""{
+				if St.Aws_access_key == "" {
 					fmt.Println("Input the AWS access key id")
 					fmt.Scanln(&aws_access_key)
-					St.Aws_access_key=aws_access_key
-				}else{
-					aws_access_key =St.Aws_access_key
+					St.Aws_access_key = aws_access_key
+				} else {
+					aws_access_key = St.Aws_access_key
 				}
 
-				if St.Aws_secret_key==""{
+				if St.Aws_secret_key == "" {
 					fmt.Println("\nInput the AWS secret key")
 					fmt.Scanln(&aws_secret_key)
-					St.Aws_secret_key =aws_secret_key
-				}else{
-					aws_secret_key=St.Aws_secret_key 
+					St.Aws_secret_key = aws_secret_key
+				} else {
+					aws_secret_key = St.Aws_secret_key
 				}
 
 				cloudLoginCredentials = awslogin(aws_access_key, aws_secret_key, "", "")
@@ -311,11 +369,11 @@ func main() {
 	if cloudLoginCredentials {
 		fmt.Println(string(Green), "\n*******  Let's proceed with cluster creation, please input the requested details below *********\n")
 		fmt.Println(string(Green), "Make sure that the cluster name is unique if you are trying consecutively, duplicate DNS/hosts file entry under digit.org domain could have been mapped already\n")
-		if St.Clustername==""{
+		if St.Clustername == "" {
 			cluster_name = enterValue(nil, "How do you want to name the Cluster? eg: your-name_dev or your-name_poc")
-			St.Clustername=cluster_name
-		}else{
-			cluster_name=St.Clustername
+			St.Clustername = cluster_name
+		} else {
+			cluster_name = St.Clustername
 		}
 		// fmt.Println("How do you want to name the Cluster? \n eg: your-name_dev or your-name_poc")
 		// fmt.Scanln(&cluster_name)
@@ -329,13 +387,13 @@ func main() {
 			gitCmd = fmt.Sprintf("git -C %s pull", repoDirRoot)
 		}
 		err1 := execCommand(gitCmd)
-		if err1 ==nil{
-			St.Git_command="success"
+		if err1 == nil {
+			St.Git_command = "success"
 		}
-		if err1!=nil{
-			St.Git_command="failure"
+		if err1 != nil {
+			St.Git_command = "failure"
 			writeState()
-			log.Printf("%v",err)
+			log.Printf("%v", err)
 		}
 
 		if !isProductionSetup {
@@ -370,32 +428,42 @@ func main() {
 			}
 
 		} else {
-			if St.Db_pass==""{
+			if St.Db_pass == "" {
 				db_pswd = enterValue(nil, "What should be the database password to be created, it should be 8 char min")
-				St.Db_pass=db_pswd
-			}else{
-				db_pswd=St.Db_pass
+				St.Db_pass = db_pswd
+			} else {
+				db_pswd = St.Db_pass
 			}
 			writeState()
-			err=execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s init", repoDirRoot, cloudTemplate))
-			if err!=nil{
+			if St.T_init == "failure" || St.T_init == "" {
+				err = execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s init", repoDirRoot, cloudTemplate))
+			}
+			if err == nil {
+				St.T_init = "success"
+				writeState()
+			} else {
 				St.T_init = "failure"
 				writeState()
-				log.Printf("%v",err)
 			}
-			err:=execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s plan -var=\"cluster_name=%s\" -var=\"db_password=%s\" -var=\"number_of_worker_nodes=%d\"", repoDirRoot, cloudTemplate, cluster_name, db_pswd, number_of_worker_nodes))
-			if err==nil{
-				St.T_plan="success"
+			if St.T_plan == "failure" || St.T_plan == "" {
+				err = execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s plan -var=\"cluster_name=%s\" -var=\"db_password=%s\" -var=\"number_of_worker_nodes=%d\"", repoDirRoot, cloudTemplate, cluster_name, db_pswd, number_of_worker_nodes))
+			}
+			if err == nil {
+				St.T_plan = "success"
 				writeState()
-			}else{
-				St.T_plan="failure"
+			} else {
+				St.T_plan = "failure"
 				writeState()
 			}
-			err:=execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s apply -auto-approve -var=\"cluster_name=%s\" -var=\"db_password=%s\" -var=\"number_of_worker_nodes=%d\"", repoDirRoot, cloudTemplate, cluster_name, db_pswd, number_of_worker_nodes))
-			if err!=nil{
+			if St.T_apply == "failure" || St.T_apply == "" {
+				err = execSingleCommand(fmt.Sprintf("terraform -chdir=%s/infra-as-code/terraform/%s apply -auto-approve -var=\"cluster_name=%s\" -var=\"db_password=%s\" -var=\"number_of_worker_nodes=%d\"", repoDirRoot, cloudTemplate, cluster_name, db_pswd, number_of_worker_nodes))
+			}
+			if err == nil {
+				St.T_apply = "success"
+				writeState()
+			} else {
 				St.T_apply = "failure"
 				writeState()
-				log.Printf("%v",err)
 			}
 			//calling funtion to write config file
 			Configsfile()
@@ -541,11 +609,11 @@ func selectGovServicesToInstall() string {
 	prodList, _ := file.Readdirnames(0) // 0 to read all files and folders
 
 	var optedProduct string = ""
-	if St.Product==""{
+	if St.Product == "" {
 		optedProduct, _ = sel(prodList, "Choose the Gov stack services that you would you like to install")
-		St.Product=optedProduct
-	}else{
-		optedProduct=St.Product
+		St.Product = optedProduct
+	} else {
+		optedProduct = St.Product
 	}
 	if optedProduct != "" {
 		files, err := ioutil.ReadDir(releaseChartDir + optedProduct)
@@ -558,11 +626,11 @@ func selectGovServicesToInstall() string {
 			versionfiles = append(versionfiles, name[strings.Index(name, "-")+1:strings.Index(name, ".y")])
 		}
 		var version string = ""
-		if St.Productversion == ""{
+		if St.Productversion == "" {
 			version, _ = sel(versionfiles, "Which version of the selected product would like to install?")
-			St.Productversion=version
-		}else{
-			version=St.Productversion
+			St.Productversion = version
+		} else {
+			version = St.Productversion
 		}
 		if version != "" {
 			argFile := releaseChartDir + optedProduct + "/dependancy_chart-" + version + ".yaml"
@@ -591,16 +659,16 @@ func selectGovServicesToInstall() string {
 				}
 			}
 			modules = append(modules, "Exit")
-			if len(St.Modules)==0{
+			if len(St.Modules) == 0 {
 				result, err := sel(modules, "Select the DIGIT's Gov services that you want to install, choose Exit to complete selection")
-			
+
 				for result != "Exit" && err == nil {
-				selectedMod = append(selectedMod, result)
-				St.Modules=append(St.Modules,result)
-				result, err = sel(modules, "Select the modules you want to install, you can select multiple if you wish, choose Exit to complete selection")
+					selectedMod = append(selectedMod, result)
+					St.Modules = append(St.Modules, result)
+					result, err = sel(modules, "Select the modules you want to install, you can select multiple if you wish, choose Exit to complete selection")
 				}
-			}else{
-				selectedMod=St.Modules
+			} else {
+				selectedMod = St.Modules
 			}
 			if selectedMod != nil {
 				for _, mod := range selectedMod {
@@ -622,6 +690,8 @@ func selectGovServicesToInstall() string {
 	}
 	return argStr
 }
+
+// To deploy all the services selected
 
 func deployCharts(argStr string, configFile string) {
 
@@ -687,7 +757,7 @@ func execRemoteCommand(user string, ip string, sshFileLocation string, command s
 	}
 	return err
 }
-func execSingleCommand(command string) (error) {
+func execSingleCommand(command string) error {
 	var err error
 
 	cmd := exec.Command("sh", "-c", command)
@@ -725,11 +795,11 @@ func awslogin(accessKey string, secretKey string, sessionToken string, profile s
 			log.Printf("%s", err)
 		}
 		profList := strings.Fields(out)
-		if St.Aws_profile==""{
+		if St.Aws_profile == "" {
 			profile, _ = sel(profList, "choose the profile with right access")
-			St.Aws_profile=profile
-		}else{
-			profile=St.Aws_profile
+			St.Aws_profile = profile
+		} else {
+			profile = St.Aws_profile
 		}
 		awslogincommand = fmt.Sprintf("aws configure --profile %s set region \"ap-south-1\"", profile)
 		// execCommand(fmt.Sprintf("aws configure list"))
@@ -739,10 +809,10 @@ func awslogin(accessKey string, secretKey string, sessionToken string, profile s
 	log.Println(awslogincommand)
 	err := execSingleCommand(awslogincommand)
 	if err == nil {
-		St.Aws_command="success"
+		St.Aws_command = "success"
 		cloudLoginCredentials = true
-	} else{
-		St.Aws_command="failure"
+	} else {
+		St.Aws_command = "failure"
 		writeState()
 	}
 	return cloudLoginCredentials
@@ -892,51 +962,135 @@ func Configsfile() {
 	}
 	err = json.Unmarshal(State, &out)
 	Config := make(map[string]interface{})
-	Domain := enterValue(nil, "Enter a valid Domain name")
-	BranchName := enterValue(nil, "Enter Branch name")
+	HasDomain, _ := sel(Confirm, "Do you have a URL which can be used after DIGIT installation to access actual site ?")
+	var Domain string
+	if HasDomain == "yes" {
+		if St.Domain != "" {
+			Domain = St.Domain
+		} else {
+			Domain = enterValue(nil, "Enter Domain name")
+			St.Domain = Domain
+		}
+	} else {
+		fmt.Println("Create a domain From Godaddy or any other DNS providers and come back.")
+		Domain = enterValue(nil, "Enter Domain name")
+		Domain = St.Domain
+	}
+	HasGitacc, _ := sel(Confirm, "Do you have a Github Account ?")
+	var BranchName string
+	if HasGitacc == "Yes" {
+		if St.Branch != "" {
+			BranchName = St.Branch
+		} else {
+			BranchName = enterValue(nil, "Enter Branch name for Configs and MDMS eg: UAT,QA")
+			St.Branch = BranchName
+		}
+	} else {
+		fmt.Println("click on the URL https://github.com/ to create a github account \n\tNote: Create two github account one will be used as Org account and other as user.")
+	}
 	Kvids := out.Outputs.KafkaVolIds.Value
 	Zvids := out.Outputs.ZookeeperVolumeIds.Value
 	Esdids := out.Outputs.EsDataVolumeIds.Value
 	Esmvids := out.Outputs.EsMasterVolumeIds.Value
-	con_branch := enterValue(nil, "Enter your configs git url")
-	mdms_branch := enterValue(nil, "Enter your mdms git url")
+	fmt.Println("Fork the Configs and egov-mdms-data repositories to Org account and give User account permission over the repos")
+	var con_branch string
+	if St.Config_git_url != "" {
+		con_branch = St.Config_git_url
+	} else {
+		con_branch = enterValue(nil, "Enter your configs repo ssh url")
+		St.Config_git_url = con_branch
+	}
+	var mdms_branch string
+	if St.Mdms_git_url != "" {
+		mdms_branch = St.Mdms_git_url
+	} else {
+		mdms_branch = enterValue(nil, "Enter your mdms repo ssh url")
+		St.Mdms_git_url = mdms_branch
+	}
 	Config["Domain"] = Domain
 	Config["BranchName"] = BranchName
 	Config["db-host"] = out.Outputs.DbInstanceEndpoint.Value
 	Config["db_name"] = out.Outputs.DbInstanceName.Value
-	Config["configs-branch"]= con_branch
-	Config["mdms-branch"]= mdms_branch
+	Config["configs-branch"] = con_branch
+	Config["mdms-branch"] = mdms_branch
 	Config["file_name"] = cluster_name
-	smsproceed, _ := sel(Confirm, "Do You have your sms Gateway?")
+	var smsproceed string
+	if St.SmsGateway != "" {
+		smsproceed = St.Smsproceed
+	} else {
+		smsproceed, _ = sel(Confirm, "Do You have your sms Gateway?")
+		St.Smsproceed = smsproceed
+	}
 	if smsproceed == "Yes" {
-		SmsUrl := enterValue(nil, "Enter your SMS provider url")
-		SmsGateway := enterValue(nil, "Enter your SMS Gateway")
-		SmsSender := enterValue(nil, "Enter your SMS sender")
-		SmsUsername := enterValue(nil, "Enter EgovNotificationSms_Username")
-		
+		var SmsUrl string
+		if St.SmsUrl != "" {
+			SmsUrl = St.SmsUrl
+		} else {
+			SmsUrl = enterValue(nil, "Enter your SMS provider url")
+			St.SmsUrl = SmsUrl
+		}
+		var SmsGateway string
+		if St.SmsGateway != "" {
+			SmsGateway = St.SmsGateway
+		} else {
+			SmsGateway = enterValue(nil, "Enter your SMS Gateway")
+			St.SmsGateway = SmsGateway
+		}
+		var SmsSender string
+		if St.SmsSender != "" {
+			SmsSender = St.SmsSender
+		} else {
+			SmsSender = enterValue(nil, "Enter your SMS sender")
+			St.SmsSender = SmsSender
+		}
+
 		Config["sms-provider-url"] = SmsUrl
 		Config["sms-gateway-to-use"] = SmsGateway
 		Config["sms-sender"] = SmsSender
-		
-		SecretConfig["EgovNotificationSms_Username"]=SmsUsername
+
 	}
-	fileproceed, _ := sel(Confirm, "Do You need filestore?")
+	var fileproceed string
+	if St.Fileproceed != "" {
+		fileproceed = St.Fileproceed
+	} else {
+		fileproceed, _ = sel(Confirm, "Do You need filestore which is used to to store files?")
+		St.Fileproceed = fileproceed
+	}
 	if fileproceed == "Yes" {
 		if Flag == "aws" {
-			bucket := enterValue(nil, "Enter the filestore bucket name")
+			var bucket string
+			if St.Bucket != "" {
+				bucket = St.Bucket
+			} else {
+				bucket := enterValue(nil, "Enter the filestore bucket name")
+				St.Bucket = bucket
+			}
 			Config["fixed-bucket"] = bucket
 		}
 		if Flag == "sdc" {
-			bucket := enterValue(nil, "Enter the filestore bucket name")
+			var bucket string
+			if St.Bucket != "" {
+				bucket = St.Bucket
+			} else {
+				bucket := enterValue(nil, "Enter the filestore bucket name")
+				St.Bucket = bucket
+			}
 			Config["fixed-bucket"] = bucket
 		}
 	}
-	botproceed, _ := sel(Confirm, "Do You need chatbot?")
+	var botproceed string
+	if St.Botproceed != "" {
+		botproceed = St.Botproceed
+	} else {
+		botproceed, _ = sel(Confirm, "Do You need chatbot?")
+		St.Botproceed = botproceed
+	}
+	writeState()
 	configs.DeployConfig(Config, Kvids, Zvids, Esdids, Esmvids, selectedMod, smsproceed, fileproceed, botproceed, Flag)
 
 }
 
-// write to secrets
+// writes secrets to file
 func envSecretsFile() {
 	generateSsh()
 	ssh := ""
@@ -945,7 +1099,8 @@ func envSecretsFile() {
 	if err != nil {
 		log.Printf("%s", err)
 	}
-	configs.SecretFile(cluster_name, Out,SecretConfig)
+	Sec_map := structs.Map(St)
+	configs.SecretFile(cluster_name, Out, selectedMod, Sec_map)
 }
 
 // generate ssh key to configs file
@@ -1003,6 +1158,7 @@ func endScript() {
 	return
 }
 
+// Writes the state to file
 func writeState() {
 	state, err := yaml.Marshal(&St)
 	if err != nil {
