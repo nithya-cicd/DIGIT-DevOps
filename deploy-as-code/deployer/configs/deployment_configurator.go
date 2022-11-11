@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	yaml "gopkg.in/yaml.v3"
@@ -1285,7 +1286,7 @@ func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string,
 }
 
 //secrets config
-func SecretFile(cluster_name string, Ssh string, modules []string, St map[string]interface{}) {
+func SecretFile(cluster_name string, Ssh string, modules []string) {
 	var sec Secret
 	secret, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/egov-demo-secrets.yaml")
 	if err != nil {
@@ -1294,6 +1295,18 @@ func SecretFile(cluster_name string, Ssh string, modules []string, St map[string
 	err = yaml.Unmarshal(secret, &sec)
 	if err != nil {
 		log.Printf("%v", err)
+	}
+	secFilename := fmt.Sprintf("../../config-as-code/environments/%s-secrets.yaml", cluster_name)
+	var Sec_state Secret
+	if _, err := os.Stat("secrectstate.yaml"); err == nil {
+		state, err := ioutil.ReadFile("secrectstate.yaml")
+		if err != nil {
+			log.Printf("%v", err)
+		}
+		err = yaml.Unmarshal(state, &Sec_state)
+		if err != nil {
+			log.Printf("%v", err)
+		}
 	}
 	// fmt.Println("The secret list")
 	// fmt.Println(St)
@@ -1381,30 +1394,49 @@ func SecretFile(cluster_name string, Ssh string, modules []string, St map[string
 	ClientID := sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientID
 	ClientSecret := sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret
 	CookieSecret := sec.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret
-
-	fmt.Println("Enter Db_Username:")
-	fmt.Scanln(&Db_Username)
+	if Sec_state.ClusterConfigs.Secrets.Db.Username != "" {
+		Sec_state.ClusterConfigs.Secrets.Db.Username = Sec_state.ClusterConfigs.Secrets.Db.Username
+	} else {
+		fmt.Println("Enter Db_Username:")
+		fmt.Scanln(&Db_Username)
+		Sec_state.ClusterConfigs.Secrets.Db.Username = Db_Username
+	}
 	if Db_Username != "" {
 		sec.ClusterConfigs.Secrets.Db.Username = Db_Username
 	} else {
 		sec.ClusterConfigs.Secrets.Db.Username = Username
 	}
-	fmt.Println("Enter Db_Password:")
-	fmt.Scanln(&Db_Password)
+	if Sec_state.ClusterConfigs.Secrets.Db.Password != "" {
+		Sec_state.ClusterConfigs.Secrets.Db.Password = Sec_state.ClusterConfigs.Secrets.Db.Password
+	} else {
+		fmt.Println("Enter Db_Password:")
+		fmt.Scanln(&Db_Password)
+		Sec_state.ClusterConfigs.Secrets.Db.Password = Db_Password
+	}
 	if Db_Password != "" {
 		sec.ClusterConfigs.Secrets.Db.Password = Db_Password
 	} else {
 		sec.ClusterConfigs.Secrets.Db.Password = Password
 	}
-	fmt.Println("Enter Db_FlywayUsername:")
-	fmt.Scanln(&Db_FlywayUsername)
+	if Sec_state.ClusterConfigs.Secrets.Db.FlywayUsername != "" {
+		Sec_state.ClusterConfigs.Secrets.Db.FlywayUsername = Sec_state.ClusterConfigs.Secrets.Db.FlywayUsername
+	} else {
+		fmt.Println("Enter Db_FlywayUsername:")
+		fmt.Scanln(&Db_FlywayUsername)
+		Sec_state.ClusterConfigs.Secrets.Db.FlywayUsername = Db_FlywayUsername
+	}
 	if Db_FlywayUsername != "" {
 		sec.ClusterConfigs.Secrets.Db.FlywayUsername = Db_FlywayUsername
 	} else {
 		sec.ClusterConfigs.Secrets.Db.FlywayUsername = FlywayUsername
 	}
-	fmt.Println("Enter Db_FlywayPassword:")
-	fmt.Scanln(&Db_FlywayPassword)
+	if Sec_state.ClusterConfigs.Secrets.Db.FlywayPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.Db.FlywayPassword = Sec_state.ClusterConfigs.Secrets.Db.FlywayPassword
+	} else {
+		fmt.Println("Enter Db_FlywayPassword:")
+		fmt.Scanln(&Db_FlywayPassword)
+		Sec_state.ClusterConfigs.Secrets.Db.FlywayPassword = Db_FlywayPassword
+	}
 	if Db_FlywayPassword != "" {
 		sec.ClusterConfigs.Secrets.Db.FlywayPassword = Db_FlywayPassword
 	} else {
@@ -1412,113 +1444,193 @@ func SecretFile(cluster_name string, Ssh string, modules []string, St map[string
 	}
 	for i := range modules {
 		if modules[i] == "m_property-tax" {
-			fmt.Println("Enter EgovNotificationSms_Username:")
-			fmt.Scanln(&EgovNotificationSms_Username)
+			if Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Username != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Username = Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Username
+			} else {
+				fmt.Println("Enter EgovNotificationSms_Username:")
+				fmt.Scanln(&EgovNotificationSms_Username)
+				Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Username = EgovNotificationSms_Username
+			}
 			if EgovNotificationSms_Username != "" {
 				sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = EgovNotificationSms_Username
 			} else {
 				sec.ClusterConfigs.Secrets.EgovNotificationSms.Username = NotUsername
 			}
-			fmt.Println("Enter EgovNotificationSms_Password:")
-			fmt.Scanln(&EgovNotificationSms_Password)
+			if Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Password != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Password = Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Password
+			} else {
+				fmt.Println("Enter EgovNotificationSms_Password:")
+				fmt.Scanln(&EgovNotificationSms_Password)
+				Sec_state.ClusterConfigs.Secrets.EgovNotificationSms.Password = EgovNotificationSms_Password
+			}
 			if EgovNotificationSms_Password != "" {
 				sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = EgovNotificationSms_Password
 			} else {
 				sec.ClusterConfigs.Secrets.EgovNotificationSms.Password = NotPassword
 			}
-			fmt.Println("Enter EgovFilestore_AwsKey:")
-			fmt.Scanln(&EgovFilestore_AwsKey)
+			if Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsKey != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsKey = Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsKey
+			} else {
+				fmt.Println("Enter EgovFilestore_AwsKey:")
+				fmt.Scanln(&EgovFilestore_AwsKey)
+				Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsKey = EgovFilestore_AwsKey
+			}
 			if EgovFilestore_AwsKey != "" {
 				sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = EgovFilestore_AwsKey
 			} else {
 				sec.ClusterConfigs.Secrets.EgovFilestore.AwsKey = AwsKey
 			}
-			fmt.Println("Enter EgovFilestore_AwsSecretKey:")
-			fmt.Scanln(&EgovFilestore_AwsSecretKey)
+			if Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey
+			} else {
+				fmt.Println("Enter EgovFilestore_AwsSecretKey:")
+				fmt.Scanln(&EgovFilestore_AwsSecretKey)
+				Sec_state.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = EgovFilestore_AwsSecretKey
+			}
 			if EgovFilestore_AwsSecretKey != "" {
 				sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = EgovFilestore_AwsSecretKey
 			} else {
 				sec.ClusterConfigs.Secrets.EgovFilestore.AwsSecretKey = AwsSecretKey
 			}
-			fmt.Println("Enter EgovLocation_Gmapskey:")
-			fmt.Scanln(&EgovLocation_Gmapskey)
+			if Sec_state.ClusterConfigs.Secrets.EgovLocation.Gmapskey != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovLocation.Gmapskey = Sec_state.ClusterConfigs.Secrets.EgovLocation.Gmapskey
+			} else {
+				fmt.Println("Enter EgovLocation_Gmapskey:")
+				fmt.Scanln(&EgovLocation_Gmapskey)
+				Sec_state.ClusterConfigs.Secrets.EgovLocation.Gmapskey = EgovLocation_Gmapskey
+			}
 			if EgovLocation_Gmapskey != "" {
 				sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = EgovLocation_Gmapskey
 			} else {
 				sec.ClusterConfigs.Secrets.EgovLocation.Gmapskey = Gmapskey
 			}
-			fmt.Println("Enter EgovPgService_AxisMerchantID:")
-			fmt.Scanln(&EgovPgService_AxisMerchantID)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID
+			} else {
+				fmt.Println("Enter EgovPgService_AxisMerchantID:")
+				fmt.Scanln(&EgovPgService_AxisMerchantID)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = EgovPgService_AxisMerchantID
+			}
 			if EgovPgService_AxisMerchantID != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = EgovPgService_AxisMerchantID
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantID = AxisMerchantID
 			}
-			fmt.Println("Enter EgovPgService_AxisMerchantSecretKey:")
-			fmt.Scanln(&EgovPgService_AxisMerchantSecretKey)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey
+			} else {
+				fmt.Println("Enter EgovPgService_AxisMerchantSecretKey:")
+				fmt.Scanln(&EgovPgService_AxisMerchantSecretKey)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = EgovPgService_AxisMerchantSecretKey
+			}
 			if EgovPgService_AxisMerchantSecretKey != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = EgovPgService_AxisMerchantSecretKey
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantSecretKey = AxisMerchantSecretKey
 			}
-			fmt.Println("Enter EgovPgService_AxisMerchantUser:")
-			fmt.Scanln(&EgovPgService_AxisMerchantUser)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser
+			} else {
+				fmt.Println("Enter EgovPgService_AxisMerchantUser:")
+				fmt.Scanln(&EgovPgService_AxisMerchantUser)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = EgovPgService_AxisMerchantUser
+			}
 			if EgovPgService_AxisMerchantUser != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = EgovPgService_AxisMerchantUser
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantUser = AxisMerchantUser
 			}
-			fmt.Println("Enter EgovPgService_AxisMerchantPwd:")
-			fmt.Scanln(&EgovPgService_AxisMerchantPwd)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd
+			} else {
+				fmt.Println("Enter EgovPgService_AxisMerchantPwd:")
+				fmt.Scanln(&EgovPgService_AxisMerchantPwd)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = EgovPgService_AxisMerchantPwd
+			}
 			if EgovPgService_AxisMerchantPwd != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = EgovPgService_AxisMerchantPwd
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantPwd = AxisMerchantPwd
 			}
-			fmt.Println("Enter EgovPgService_AxisMerchantAccessCode:")
-			fmt.Scanln(&EgovPgService_AxisMerchantAccessCode)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode
+			} else {
+				fmt.Println("Enter EgovPgService_AxisMerchantAccessCode:")
+				fmt.Scanln(&EgovPgService_AxisMerchantAccessCode)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = EgovPgService_AxisMerchantAccessCode
+			}
 			if EgovPgService_AxisMerchantAccessCode != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = EgovPgService_AxisMerchantAccessCode
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.AxisMerchantAccessCode = AxisMerchantAccessCode
 			}
-			fmt.Println("Enter EgovPgService_PayuMerchantKey:")
-			fmt.Scanln(&EgovPgService_PayuMerchantKey)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey
+			} else {
+				fmt.Println("Enter EgovPgService_PayuMerchantKey:")
+				fmt.Scanln(&EgovPgService_PayuMerchantKey)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = EgovPgService_PayuMerchantKey
+			}
 			if EgovPgService_PayuMerchantKey != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = EgovPgService_PayuMerchantKey
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantKey = PayuMerchantKey
 			}
-			fmt.Println("Enter EgovPgService_PayuMerchantSalt:")
-			fmt.Scanln(&EgovPgService_PayuMerchantSalt)
+			if Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt != "" {
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt
+			} else {
+				fmt.Println("Enter EgovPgService_PayuMerchantSalt:")
+				fmt.Scanln(&EgovPgService_PayuMerchantSalt)
+				Sec_state.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = EgovPgService_PayuMerchantSalt
+			}
 			if EgovPgService_PayuMerchantSalt != "" {
 				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = EgovPgService_PayuMerchantSalt
 			} else {
 				sec.ClusterConfigs.Secrets.EgovPgService.PayuMerchantSalt = PayuMerchantSalt
 			}
-			fmt.Println("Enter Pgadmin_AdminEmail:")
-			fmt.Scanln(&Pgadmin_AdminEmail)
+			if Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminEmail != "" {
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminEmail = Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminEmail
+			} else {
+				fmt.Println("Enter Pgadmin_AdminEmail:")
+				fmt.Scanln(&Pgadmin_AdminEmail)
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminEmail = Pgadmin_AdminEmail
+			}
 			if Pgadmin_AdminEmail != "" {
 				sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = Pgadmin_AdminEmail
 			} else {
 				sec.ClusterConfigs.Secrets.Pgadmin.AdminEmail = AdminEmail
 			}
-			fmt.Println("Enter Pgadmin_AdminPassword:")
-			fmt.Scanln(&Pgadmin_AdminPassword)
+			if Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminPassword != "" {
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminPassword = Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminPassword
+			} else {
+				fmt.Println("Enter Pgadmin_AdminPassword:")
+				fmt.Scanln(&Pgadmin_AdminPassword)
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.AdminPassword = Pgadmin_AdminPassword
+			}
 			if Pgadmin_AdminPassword != "" {
 				sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = Pgadmin_AdminPassword
 			} else {
 				sec.ClusterConfigs.Secrets.Pgadmin.AdminPassword = AdminPassword
 			}
-			fmt.Println("Enter Pgadmin_ReadEmail:")
-			fmt.Scanln(&Pgadmin_ReadEmail)
+			if Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadEmail != "" {
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadEmail = Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadEmail
+			} else {
+				fmt.Println("Enter Pgadmin_ReadEmail:")
+				fmt.Scanln(&Pgadmin_ReadEmail)
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadEmail = Pgadmin_ReadEmail
+			}
 			if Pgadmin_ReadEmail != "" {
 				sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = Pgadmin_ReadEmail
 			} else {
 				sec.ClusterConfigs.Secrets.Pgadmin.ReadEmail = ReadEmail
 			}
-			fmt.Println("Enter Pgadmin_ReadPassword:")
-			fmt.Scanln(&Pgadmin_ReadPassword)
+			if Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadPassword != "" {
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadPassword = Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadPassword
+			} else {
+				fmt.Println("Enter Pgadmin_ReadPassword:")
+				fmt.Scanln(&Pgadmin_ReadPassword)
+				Sec_state.ClusterConfigs.Secrets.Pgadmin.ReadPassword = Pgadmin_ReadPassword
+			}
 			if Pgadmin_ReadPassword != "" {
 				sec.ClusterConfigs.Secrets.Pgadmin.ReadPassword = Pgadmin_ReadPassword
 			} else {
@@ -1526,36 +1638,61 @@ func SecretFile(cluster_name string, Ssh string, modules []string, St map[string
 			}
 		}
 	}
-	fmt.Println("Enter EgovEncService_MasterPassword:")
-	fmt.Scanln(&EgovEncService_MasterPassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterPassword = Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterPassword
+	} else {
+		fmt.Println("Enter EgovEncService_MasterPassword:")
+		fmt.Scanln(&EgovEncService_MasterPassword)
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterPassword = EgovEncService_MasterPassword
+	}
 	if EgovEncService_MasterPassword != "" {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterPassword = EgovEncService_MasterPassword
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterPassword = MasterPassword
 	}
-	fmt.Println("Enter EgovEncService_MasterSalt:")
-	fmt.Scanln(&EgovEncService_MasterSalt)
+	if Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterSalt != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterSalt = Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterSalt
+	} else {
+		fmt.Println("Enter EgovEncService_MasterSalt:")
+		fmt.Scanln(&EgovEncService_MasterSalt)
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterSalt = EgovEncService_MasterSalt
+	}
 	if EgovEncService_MasterSalt != "" {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterSalt = EgovEncService_MasterSalt
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterSalt = MasterSalt
 	}
-	fmt.Println("Enter EgovEncService_MasterInitialvector:")
-	fmt.Scanln(&EgovEncService_MasterInitialvector)
+	if Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector = Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector
+	} else {
+		fmt.Println("Enter EgovEncService_MasterInitialvector:")
+		fmt.Scanln(&EgovEncService_MasterInitialvector)
+		Sec_state.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector = EgovEncService_MasterInitialvector
+	}
 	if EgovEncService_MasterInitialvector != "" {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector = EgovEncService_MasterInitialvector
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEncService.MasterInitialvector = MasterInitialvector
 	}
-	fmt.Println("Enter EgovNotificationMail_Mailsenderusername:")
-	fmt.Scanln(&EgovNotificationMail_Mailsenderusername)
+	if Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername = Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername
+	} else {
+		fmt.Println("Enter EgovNotificationMail_Mailsenderusername:")
+		fmt.Scanln(&EgovNotificationMail_Mailsenderusername)
+		Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername = EgovNotificationMail_Mailsenderusername
+	}
 	if EgovNotificationMail_Mailsenderusername != "" {
 		sec.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername = EgovNotificationMail_Mailsenderusername
 	} else {
 		sec.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderusername = Mailsenderusername
 	}
-	fmt.Println("Enter EgovNotificationMail_Mailsenderpassword:")
-	fmt.Scanln(&EgovNotificationMail_Mailsenderpassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderpassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderpassword = Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderpassword
+	} else {
+		fmt.Println("Enter EgovNotificationMail_Mailsenderpassword:")
+		fmt.Scanln(&EgovNotificationMail_Mailsenderpassword)
+		Sec_state.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderpassword = EgovNotificationMail_Mailsenderpassword
+	}
 	if EgovNotificationMail_Mailsenderpassword != "" {
 		sec.ClusterConfigs.Secrets.EgovNotificationMail.Mailsenderpassword = EgovNotificationMail_Mailsenderpassword
 	} else {
@@ -1563,117 +1700,200 @@ func SecretFile(cluster_name string, Ssh string, modules []string, St map[string
 	}
 	sec.ClusterConfigs.Secrets.GitSync.SSH = Ssh
 	sec.ClusterConfigs.Secrets.GitSync.KnownHosts = KnownHosts
-	fmt.Println("Enter Kibana_Namespace:")
-	fmt.Scanln(&Kibana_Namespace)
+	if Sec_state.ClusterConfigs.Secrets.Kibana.Namespace != "" {
+		Sec_state.ClusterConfigs.Secrets.Kibana.Namespace = Sec_state.ClusterConfigs.Secrets.Kibana.Namespace
+	} else {
+		fmt.Println("Enter Kibana_Namespace:")
+		fmt.Scanln(&Kibana_Namespace)
+		Sec_state.ClusterConfigs.Secrets.Kibana.Namespace = Kibana_Namespace
+	}
 	if Kibana_Namespace != "" {
 		sec.ClusterConfigs.Secrets.Kibana.Namespace = Kibana_Namespace
 	} else {
 		sec.ClusterConfigs.Secrets.Kibana.Namespace = Namespace
 	}
-	fmt.Println("Enter Kibana_Credentials:")
-	fmt.Scanln(&Kibana_Credentials)
+	if Sec_state.ClusterConfigs.Secrets.Kibana.Credentials != "" {
+		Sec_state.ClusterConfigs.Secrets.Kibana.Credentials = Sec_state.ClusterConfigs.Secrets.Kibana.Credentials
+	} else {
+		fmt.Println("Enter Kibana_Credentials:")
+		fmt.Scanln(&Kibana_Credentials)
+		Sec_state.ClusterConfigs.Secrets.Kibana.Credentials = Kibana_Credentials
+	}
 	if Kibana_Credentials != "" {
 		sec.ClusterConfigs.Secrets.Kibana.Credentials = Kibana_Credentials
 	} else {
 		sec.ClusterConfigs.Secrets.Kibana.Credentials = Credentials
 	}
-	fmt.Println("Enter EgovSiMicroservice_SiMicroserviceUser:")
-	fmt.Scanln(&EgovSiMicroservice_SiMicroserviceUser)
+	if Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser = Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser
+	} else {
+		fmt.Println("Enter EgovSiMicroservice_SiMicroserviceUser:")
+		fmt.Scanln(&EgovSiMicroservice_SiMicroserviceUser)
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser = EgovSiMicroservice_SiMicroserviceUser
+	}
 	if EgovSiMicroservice_SiMicroserviceUser != "" {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser = EgovSiMicroservice_SiMicroserviceUser
 	} else {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroserviceUser = SiMicroserviceUser
 	}
-	fmt.Println("Enter EgovSiMicroservice_SiMicroservicePassword:")
-	fmt.Scanln(&EgovSiMicroservice_SiMicroservicePassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword = Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword
+	} else {
+		fmt.Println("Enter EgovSiMicroservice_SiMicroservicePassword:")
+		fmt.Scanln(&EgovSiMicroservice_SiMicroservicePassword)
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword = EgovSiMicroservice_SiMicroservicePassword
+	}
 	if EgovSiMicroservice_SiMicroservicePassword != "" {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword = EgovSiMicroservice_SiMicroservicePassword
 	} else {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.SiMicroservicePassword = SiMicroservicePassword
 	}
-	fmt.Println("Enter EgovSiMicroservice_MailSenderPassword:")
-	fmt.Scanln(&EgovSiMicroservice_MailSenderPassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword = Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword
+	} else {
+		fmt.Println("Enter EgovSiMicroservice_MailSenderPassword:")
+		fmt.Scanln(&EgovSiMicroservice_MailSenderPassword)
+		Sec_state.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword = EgovSiMicroservice_MailSenderPassword
+	}
 	if EgovSiMicroservice_MailSenderPassword != "" {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword = EgovSiMicroservice_MailSenderPassword
 	} else {
 		sec.ClusterConfigs.Secrets.EgovSiMicroservice.MailSenderPassword = MailSenderPassword
 	}
-	fmt.Println("Enter EgovEdcrNotification_EdcrMailUsername:")
-	fmt.Scanln(&EgovEdcrNotification_EdcrMailUsername)
+	if Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername = Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername
+	} else {
+		fmt.Println("Enter EgovEdcrNotification_EdcrMailUsername:")
+		fmt.Scanln(&EgovEdcrNotification_EdcrMailUsername)
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername = EgovEdcrNotification_EdcrMailUsername
+	}
 	if EgovEdcrNotification_EdcrMailUsername != "" {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername = EgovEdcrNotification_EdcrMailUsername
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailUsername = EdcrMailUsername
 	}
-	fmt.Println("Enter EgovEdcrNotification_EdcrMailPassword:")
-	fmt.Scanln(&EgovEdcrNotification_EdcrMailPassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword = Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword
+	} else {
+		fmt.Println("Enter EgovEdcrNotification_EdcrMailPassword:")
+		fmt.Scanln(&EgovEdcrNotification_EdcrMailPassword)
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword = EgovEdcrNotification_EdcrMailPassword
+	}
 	if EgovEdcrNotification_EdcrMailPassword != "" {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword = EgovEdcrNotification_EdcrMailPassword
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrMailPassword = EdcrMailPassword
 	}
-	fmt.Println("Enter EgovEdcrNotification_EdcrSmsUsername:")
-	fmt.Scanln(&EgovEdcrNotification_EdcrSmsUsername)
+	if Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername = Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername
+	} else {
+		fmt.Println("Enter EgovEdcrNotification_EdcrSmsUsername:")
+		fmt.Scanln(&EgovEdcrNotification_EdcrSmsUsername)
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername = EgovEdcrNotification_EdcrSmsUsername
+	}
 	if EgovEdcrNotification_EdcrSmsUsername != "" {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername = EgovEdcrNotification_EdcrSmsUsername
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsUsername = EdcrSmsUsername
 	}
-	fmt.Println("Enter EgovEdcrNotification_EdcrSmsPassword:")
-	fmt.Scanln(&EgovEdcrNotification_EdcrSmsPassword)
+	if Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword = Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword
+	} else {
+		fmt.Println("Enter EgovEdcrNotification_EdcrSmsPassword:")
+		fmt.Scanln(&EgovEdcrNotification_EdcrSmsPassword)
+		Sec_state.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword = EgovEdcrNotification_EdcrSmsPassword
+	}
 	if EgovEdcrNotification_EdcrSmsPassword != "" {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword = EgovEdcrNotification_EdcrSmsPassword
 	} else {
 		sec.ClusterConfigs.Secrets.EgovEdcrNotification.EdcrSmsPassword = EdcrSmsPassword
 	}
-	fmt.Println("Enter Chatbot_ValuefirstUsername:")
-	fmt.Scanln(&Chatbot_ValuefirstUsername)
+	if Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername != "" {
+		Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername = Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername
+	} else {
+		fmt.Println("Enter Chatbot_ValuefirstUsername:")
+		fmt.Scanln(&Chatbot_ValuefirstUsername)
+		Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername = Chatbot_ValuefirstUsername
+	}
 	if Chatbot_ValuefirstUsername != "" {
 		sec.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername = Chatbot_ValuefirstUsername
 	} else {
 		sec.ClusterConfigs.Secrets.Chatbot.ValuefirstUsername = ValuefirstUsername
 	}
-	fmt.Println("Enter Chatbot_ValuefirstPassword:")
-	fmt.Scanln(&Chatbot_ValuefirstPassword)
+	if Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword != "" {
+		Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword = Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword
+	} else {
+		fmt.Println("Enter Chatbot_ValuefirstPassword:")
+		fmt.Scanln(&Chatbot_ValuefirstPassword)
+		Sec_state.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword = Chatbot_ValuefirstPassword
+	}
 	if Chatbot_ValuefirstPassword != "" {
 		sec.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword = Chatbot_ValuefirstPassword
 	} else {
 		sec.ClusterConfigs.Secrets.Chatbot.ValuefirstPassword = ValuefirstPassword
 	}
-	fmt.Println("Enter EgovUserChatbot_CitizenLoginPasswordOtpFixedValue:")
-	fmt.Scanln(&EgovUserChatbot_CitizenLoginPasswordOtpFixedValue)
+	if Sec_state.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue != "" {
+		Sec_state.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue = Sec_state.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue
+	} else {
+		fmt.Println("Enter EgovUserChatbot_CitizenLoginPasswordOtpFixedValue:")
+		fmt.Scanln(&EgovUserChatbot_CitizenLoginPasswordOtpFixedValue)
+		Sec_state.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue = EgovUserChatbot_CitizenLoginPasswordOtpFixedValue
+	}
 	if EgovUserChatbot_CitizenLoginPasswordOtpFixedValue != "" {
 		sec.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue = EgovUserChatbot_CitizenLoginPasswordOtpFixedValue
 	} else {
 		sec.ClusterConfigs.Secrets.EgovUserChatbot.CitizenLoginPasswordOtpFixedValue = CitizenLoginPasswordOtpFixedValue
 	}
-	fmt.Println("Enter Oauth2Proxy_ClientID:")
-	fmt.Scanln(&Oauth2Proxy_ClientID)
+	if Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientID != "" {
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientID = Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientID
+	} else {
+		fmt.Println("Enter Oauth2Proxy_ClientID:")
+		fmt.Scanln(&Oauth2Proxy_ClientID)
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientID = Oauth2Proxy_ClientID
+	}
 	if Oauth2Proxy_ClientID != "" {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientID = Oauth2Proxy_ClientID
 	} else {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientID = ClientID
 	}
-	fmt.Println("Enter Oauth2Proxy_ClientSecret:")
-	fmt.Scanln(&Oauth2Proxy_ClientSecret)
+	if Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret != "" {
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret = Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret
+	} else {
+		fmt.Println("Enter Oauth2Proxy_ClientSecret:")
+		fmt.Scanln(&Oauth2Proxy_ClientSecret)
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret = Oauth2Proxy_ClientSecret
+	}
 	if Oauth2Proxy_ClientSecret != "" {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret = Oauth2Proxy_ClientSecret
 	} else {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.ClientSecret = ClientSecret
 	}
-	fmt.Println("Enter Oauth2Proxy_CookieSecret:")
-	fmt.Scanln(&Oauth2Proxy_CookieSecret)
+	if Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret != "" {
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret = Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret
+	} else {
+		fmt.Println("Enter Oauth2Proxy_CookieSecret:")
+		fmt.Scanln(&Oauth2Proxy_CookieSecret)
+		Sec_state.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret = Oauth2Proxy_CookieSecret
+	}
 	if Oauth2Proxy_CookieSecret != "" {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret = Oauth2Proxy_CookieSecret
 	} else {
 		sec.ClusterConfigs.Secrets.Oauth2Proxy.CookieSecret = CookieSecret
+	}
+	secretstate, err := yaml.Marshal(&Sec_state)
+	if err != nil {
+		log.Printf("%v", err)
+
+	}
+	err = ioutil.WriteFile("secrectstate.yaml", secretstate, 0644)
+	if err != nil {
+		log.Printf("%v", err)
 	}
 	secretsmar, err := yaml.Marshal(&sec)
 	if err != nil {
 		log.Printf("%v", err)
 
 	}
-	secFilename := fmt.Sprintf("../../config-as-code/environments/%s-secrets.yaml", cluster_name)
 	err = ioutil.WriteFile(secFilename, secretsmar, 0644)
 	if err != nil {
 		log.Printf("%v", err)

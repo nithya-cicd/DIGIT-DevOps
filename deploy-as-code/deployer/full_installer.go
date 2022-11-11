@@ -17,7 +17,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fatih/structs"
 	"github.com/jcelliott/lumber"
 	"github.com/manifoldco/promptui"
 	"golang.org/x/crypto/ssh"
@@ -32,9 +31,11 @@ var cloudTemplate string // Which terraform template to choose
 var repoDirRoot string
 var selectedMod []string
 var Flag string
+var Infra_flag string
 var db_pswd string
 var sshFile string
 var cluster_name string
+
 var Reset = "\033[0m"
 var Red = "\033[31m"
 var Green = "\033[32m"
@@ -56,79 +57,39 @@ type Digit struct {
 }
 
 type State struct {
-	Proceed                                           string   `yaml:"Proceed"`
-	Infra                                             string   `yaml:"Infra"`
-	Product                                           string   `yaml:"Product"`
-	Productversion                                    string   `yaml:"Productversion"`
-	Modules                                           []string `yaml:"Modules"`
-	CloudType                                         string   `yaml:"CloudType"`
-	Awsacess                                          string   `yaml:"Awsacess"`
-	Aws_access_key                                    string   `yaml:"Aws_access_key"`
-	Aws_secret_key                                    string   `yaml:"Aws_secret_key"`
-	Aws_session_key                                   string   `yaml:"Aws_session_key"`
-	Aws_profile                                       string   `yaml:"Aws Profile"`
-	Aws_command                                       string   `yaml:"Aws_command"`
-	Clustername                                       string   `yaml:"Clustername"`
-	Db_pass                                           string   `yaml:"Database password"`
-	Git_command                                       string   `yaml:"Git command"`
-	T_init                                            string   `yaml:"Terraform init"`
-	T_plan                                            string   `yaml:"Terraform plan"`
-	T_apply                                           string   `yaml:"Terraform apply"`
-	Domain                                            string   `yaml:"Domain"`
-	Branch                                            string   `yaml:"Config & mdms branch"`
-	Config_git_url                                    string   `yaml:"Configs Git URL"`
-	Mdms_git_url                                      string   `yaml:"MDMS Git URL"`
-	SmsUrl                                            string   `yaml:"SMS URL"`
-	SmsGateway                                        string   `yaml:"SMS Gateway"`
-	SmsSender                                         string   `yaml:"SMS Sender"`
-	SmsUsername                                       string   `yaml:"SMS Username"`
-	Bucket                                            string   `yaml:"Bucket name"`
-	Db_Username                                       string   `yaml:"Db_Username"`
-	Db_Password                                       string   `yaml:"Db_Password"`
-	Db_FlywayUsername                                 string   `yaml:"Db_FlywayUsername"`
-	Db_FlywayPassword                                 string   `yaml:"Db_FlywayPassword"`
-	EgovNotificationSms_Username                      string   `yaml:"EgovNotificationSms_Username"`
-	EgovNotificationSms_Password                      string   `yaml:"EgovNotificationSms_Password"`
-	EgovFilestore_AwsKey                              string   `yaml:"EgovFilestore_AwsKey"`
-	EgovFilestore_AwsSecretKey                        string   `yaml:"EgovFilestore_AwsSecretKey"`
-	EgovLocation_Gmapskey                             string   `yaml:"EgovLocation_Gmapskey"`
-	EgovPgService_AxisMerchantID                      string   `yaml:"EgovPgService_AxisMerchantID"`
-	EgovPgService_AxisMerchantSecretKey               string   `yaml:"EgovPgService_AxisMerchantSecretKey"`
-	EgovPgService_AxisMerchantUser                    string   `yaml:"EgovPgService_AxisMerchantUser"`
-	EgovPgService_AxisMerchantPwd                     string   `yaml:"EgovPgService_AxisMerchantPwd"`
-	EgovPgService_AxisMerchantAccessCode              string   `yaml:"EgovPgService_AxisMerchantAccessCode"`
-	EgovPgService_PayuMerchantKey                     string   `yaml:"EgovPgService_PayuMerchantKey"`
-	EgovPgService_PayuMerchantSalt                    string   `yaml:"EgovPgService_PayuMerchantSalt"`
-	Pgadmin_AdminEmail                                string   `yaml:"Pgadmin_AdminEmail"`
-	Pgadmin_AdminPassword                             string   `yaml:"Pgadmin_AdminPassword"`
-	Pgadmin_ReadEmail                                 string   `yaml:"Pgadmin_ReadEmail"`
-	Pgadmin_ReadPassword                              string   `yaml:"Pgadmin_ReadPassword"`
-	EgovEncService_MasterPassword                     string   `yaml:"EgovEncService_MasterPassword"`
-	EgovEncService_MasterSalt                         string   `yaml:"EgovEncService_MasterSalt"`
-	EgovEncService_MasterInitialvector                string   `yaml:"EgovEncService_MasterInitialvector"`
-	EgovNotificationMail_Mailsenderusername           string   `yaml:"EgovNotificationMail_Mailsenderusername"`
-	EgovNotificationMail_Mailsenderpassword           string   `yaml:"EgovNotificationMail_Mailsenderpassword"`
-	Kibana_Namespace                                  string   `yaml:"Kibana_Namespace"`
-	Kibana_Credentials                                string   `yaml:"Kibana_Credentials"`
-	EgovSiMicroservice_SiMicroserviceUser             string   `yaml:"EgovSiMicroservice_SiMicroserviceUser"`
-	EgovSiMicroservice_SiMicroservicePassword         string   `yaml:"EgovSiMicroservice_SiMicroservicePassword"`
-	EgovSiMicroservice_MailSenderPassword             string   `yaml:"EgovSiMicroservice_MailSenderPassword"`
-	EgovEdcrNotification_EdcrMailUsername             string   `yaml:"EgovEdcrNotification_EdcrMailUsername"`
-	EgovEdcrNotification_EdcrMailPassword             string   `yaml:"EgovEdcrNotification_EdcrMailPassword"`
-	EgovEdcrNotification_EdcrSmsUsername              string   `yaml:"EgovEdcrNotification_EdcrSmsUsername"`
-	EgovEdcrNotification_EdcrSmsPassword              string   `yaml:"EgovEdcrNotification_EdcrSmsPassword"`
-	Chatbot_ValuefirstUsername                        string   `yaml:"Chatbot_ValuefirstUsername"`
-	Chatbot_ValuefirstPassword                        string   `yaml:"Chatbot_ValuefirstPassword"`
-	EgovUserChatbot_CitizenLoginPasswordOtpFixedValue string   `yaml:"EgovUserChatbot_CitizenLoginPasswordOtpFixedValue"`
-	Oauth2Proxy_ClientID                              string   `yaml:"Oauth2Proxy_ClientID"`
-	Oauth2Proxy_ClientSecret                          string   `yaml:"Oauth2Proxy_ClientSecret"`
-	Oauth2Proxy_CookieSecret                          string   `yaml:"Oauth2Proxy_CookieSecret"`
-	Ssh                                               string   `yaml:"SSH key"`
-	KnownHosts                                        string   `yaml:"Github knownhosts"`
-	Smsproceed                                        string   `yaml:"SMS"`
-	Fileproceed                                       string   `yaml:"Filestore"`
-	Botproceed                                        string   `yaml:"Botproceed"`
-	SshCreation                                       string   `yaml:"SSH KEY creation"`
+	Proceed         string   `yaml:"Proceed"`
+	Infra           string   `yaml:"Infra"`
+	Product         string   `yaml:"Product"`
+	Productversion  string   `yaml:"Productversion"`
+	Modules         []string `yaml:"Modules"`
+	CloudType       string   `yaml:"CloudType"`
+	Awsacess        string   `yaml:"Awsacess"`
+	Aws_access_key  string   `yaml:"Aws_access_key"`
+	Aws_secret_key  string   `yaml:"Aws_secret_key"`
+	Aws_session_key string   `yaml:"Aws_session_key"`
+	Aws_profile     string   `yaml:"Aws Profile"`
+	Aws_command     string   `yaml:"Aws_command"`
+	Clustername     string   `yaml:"Clustername"`
+	Db_pass         string   `yaml:"Database password"`
+	Git_command     string   `yaml:"Git command"`
+	T_init          string   `yaml:"Terraform init"`
+	T_plan          string   `yaml:"Terraform plan"`
+	T_apply         string   `yaml:"Terraform apply"`
+	Domain          string   `yaml:"Domain"`
+	Branch          string   `yaml:"Config & mdms branch"`
+	Config_git_url  string   `yaml:"Configs Git URL"`
+	Mdms_git_url    string   `yaml:"MDMS Git URL"`
+	SmsUrl          string   `yaml:"SMS URL"`
+	SmsGateway      string   `yaml:"SMS Gateway"`
+	SmsSender       string   `yaml:"SMS Sender"`
+	SmsUsername     string   `yaml:"SMS Username"`
+	Bucket          string   `yaml:"Bucket name"`
+	Smsproceed      string   `yaml:"SMS"`
+	Fileproceed     string   `yaml:"Filestore"`
+	Botproceed      string   `yaml:"Botproceed"`
+	SshCreation     string   `yaml:"SSH KEY creation"`
+	Hasdomain       string   `yaml:"Hasdomain"`
+	Hasgitacc       string   `yaml:"Hasgitacc"`
 }
 
 var St State
@@ -177,14 +138,15 @@ func main() {
 		"5. Production: HA/DRS Setup (99.99% reliability), 50+ concurrent gov services 1000 concurrent users/sec",
 		"6. For custom options, use this calcualtor to determine the required nodes (https://docs.digit.org/Infra-calculator)"}
 
-	cloudPlatforms := []string{
+	Platforms := []string{
 		"0. Local machine/Your Existing VM",
-		"1. AWS-EC2 - Quickstart with a Single EC2 Instace on AWS",
-		"2. On-prem/Private Cloud - Quickstart with Single VM",
-		"3. AWS-EKS - Production grade Elastic Kubernetes Service (EKS)",
-		"4. AZURE-AKS - Production grade Azure Kubernetes Service (AKS)",
-		"5. GOOGLE CLOUD - Production grade Google Kubernetes Engine (GKE)",
-		"6. On-prem/Privare Cloud - Production grade Kubernetes Cluster Setup"}
+		"1. AWS-EC2 - Quickstart with a Single EC2 Instace on AWS"}
+	cloudPlatforms := []string{
+		"0. On-prem/Private Cloud - Quickstart with Single VM",
+		"1. AWS-EKS - Production grade Elastic Kubernetes Service (EKS)",
+		"2. AZURE-AKS - Production grade Azure Kubernetes Service (AKS)",
+		"3. GOOGLE CLOUD - Production grade Google Kubernetes Engine (GKE)",
+		"4. On-prem/Privare Cloud - Production grade Kubernetes Cluster Setup"}
 
 	fmt.Println(string(Green), "\n*******  Welcome to DIGIT Server setup & Deployment !!! ******** \n\n *********\n https://docs.digit.org/Infra-calculator\n")
 	const sPreReq = "Pre-requsites (Please Read Carefully):\n\tDIGIT comprises of many microservices that are packaged as docker containers that can be run on any container supported platforms like dockercompose, kubernetes, etc. Here we'll have a setup a kubernetes.\nHence the following are mandatory to have it before you proceed.\n\t1. Kubernetes(K8s) Cluster.\n\t\t[Option a] Local/VM: If you do not have k8s, using this link you can create k8s cluster on your local or on a VM.\n\t\t[b] Cloud: If you have your cloud account like AWS, Azure, GCP, SDC or NIC you can follow this link to create k8s.\n\t2. Post the k8s cluster creation you should get the Kubeconfig file, which you have saved in your local machine.\n\t\n\n Well! Let's get started with the DIGIT Setup process, if you want to abort any time press (Ctl+c), you can always come back and rerun the script."
@@ -209,6 +171,7 @@ func main() {
 		case infraType[0]:
 			number_of_worker_nodes = 0
 		case infraType[1]:
+			Infra_flag = "quickstart"
 			number_of_worker_nodes = 1
 		case infraType[2]:
 			number_of_worker_nodes = 1
@@ -228,15 +191,27 @@ func main() {
 		}
 
 		servicesToDeploy = selectGovServicesToInstall()
-		if St.CloudType == "" {
-			optedCloud, _ = sel(cloudPlatforms, "Choose the cloud type to provision the required servers for the selectdd gov stack services?")
-			St.CloudType = optedCloud
-			fmt.Println(optedCloud)
+		if Infra_flag == "quickstart" {
+			if St.CloudType == "" {
+				optedCloud, _ = sel(Platforms, "Choose the Platform type to provision the required resources for the selectd gov stack services?")
+				St.CloudType = optedCloud
+				// fmt.Println(optedCloud)
+			} else {
+				optedCloud = St.CloudType
+			}
 		} else {
-			optedCloud = St.CloudType
+			if St.CloudType == "" {
+				optedCloud, _ = sel(cloudPlatforms, "Choose the cloud type to provision the required servers for the selectdd gov stack services?")
+				St.CloudType = optedCloud
+				// fmt.Println(optedCloud)
+			} else {
+				optedCloud = St.CloudType
+			}
 		}
 		switch optedCloud {
-		case cloudPlatforms[1]:
+		case Platforms[0]:
+			// TBD
+		case Platforms[1]:
 			var optedAccessType string
 			var aws_access_key string
 			var aws_secret_key string
@@ -274,10 +249,10 @@ func main() {
 				cloudLoginCredentials = awslogin("", "", "", "")
 				fmt.Println("Proceeding with the existing AWS profile configured")
 			}
-		case cloudPlatforms[2]:
+		case cloudPlatforms[0]:
 			//TBD
 
-		case cloudPlatforms[3]:
+		case cloudPlatforms[1]:
 			var optedAccessType string
 			var aws_access_key string
 			var aws_secret_key string
@@ -343,19 +318,19 @@ func main() {
 				fmt.Println("Proceeding with the existing AWS profile configured")
 			}
 
-		case cloudPlatforms[4]:
+		case cloudPlatforms[2]:
 			cloudTemplate = "sample-azure"
 			fmt.Println("\n Great, you need to input your " + optedCloud + "credentials to provision the cloud resources ..\n")
 			azure_username := enterValue(nil, "Please enter your AZURE UserName")
 			azure_password := enterValue(nil, "Enter your AZURE Password")
 			cloudLoginCredentials = azurelogin(azure_username, azure_password)
 
-		case cloudPlatforms[5]:
+		case cloudPlatforms[3]:
 			cloudTemplate = "sample-gcp"
 			fmt.Println("\n Great, you need to input your " + optedCloud + "credentials to provision the cloud resources ..\n")
 			fmt.Println("Support for the " + optedCloud + "is still underway ... you need to wait")
 
-		case cloudPlatforms[6]:
+		case cloudPlatforms[4]:
 			cloudTemplate = "sample-private-cloud"
 			fmt.Println("\n Great, you need to input your " + optedCloud + "credentials to provision the cloud resources ..\n")
 			fmt.Println("Support for the " + optedCloud + "is still underway ... you need to wait")
@@ -469,6 +444,7 @@ func main() {
 			Configsfile()
 			//calling function to create secret file
 			envSecretsFile()
+			writeState()
 
 		}
 	}
@@ -476,7 +452,6 @@ func main() {
 	if contextset {
 		deployCharts(servicesToDeploy, cluster_name)
 	}
-
 	//terraform output to a file
 	//replace the env values with the tf output
 	//save the kubetconfig and set the currentcontext
@@ -962,21 +937,34 @@ func Configsfile() {
 	}
 	err = json.Unmarshal(State, &out)
 	Config := make(map[string]interface{})
-	HasDomain, _ := sel(Confirm, "Do you have a URL which can be used after DIGIT installation to access actual site ?")
+	var HasDomain string
+	if St.Hasdomain != "" {
+		HasDomain = St.Hasdomain
+	} else {
+		HasDomain, _ = sel(Confirm, "Do you have a URL which can be used after DIGIT installation to access actual site ?")
+		St.Hasdomain = HasDomain
+	}
 	var Domain string
-	if HasDomain == "yes" {
+	if HasDomain == "Yes" {
 		if St.Domain != "" {
 			Domain = St.Domain
 		} else {
 			Domain = enterValue(nil, "Enter Domain name")
 			St.Domain = Domain
+			writeState()
 		}
 	} else {
 		fmt.Println("Create a domain From Godaddy or any other DNS providers and come back.")
 		Domain = enterValue(nil, "Enter Domain name")
 		Domain = St.Domain
 	}
-	HasGitacc, _ := sel(Confirm, "Do you have a Github Account ?")
+	var HasGitacc string
+	if St.Hasgitacc != "" {
+		HasGitacc = St.Hasgitacc
+	} else {
+		HasGitacc, _ = sel(Confirm, "Do you have a Github Account ?")
+		St.Hasgitacc = HasGitacc
+	}
 	var BranchName string
 	if HasGitacc == "Yes" {
 		if St.Branch != "" {
@@ -1099,8 +1087,7 @@ func envSecretsFile() {
 	if err != nil {
 		log.Printf("%s", err)
 	}
-	Sec_map := structs.Map(St)
-	configs.SecretFile(cluster_name, Out, selectedMod, Sec_map)
+	configs.SecretFile(cluster_name, Out, selectedMod)
 }
 
 // generate ssh key to configs file
